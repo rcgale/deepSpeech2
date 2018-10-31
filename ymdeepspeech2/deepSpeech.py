@@ -181,7 +181,7 @@ def inference(feats, seq_lens, params, num_classes):
         logits = tf.add(tf.matmul(logit_inputs, weights, transpose_a=False, transpose_b=True),
                         biases, name=scope.name)
         logits = tf.reshape(logits, [-1, params.batch_size, num_classes])
-        activation_summary(logits)
+        _activation_summary(logits)
 
     return logits
 
@@ -223,9 +223,9 @@ def loss(logits, labels, seq_lens):
                               ctc_merge_repeated=True,
                               time_major=True,
                               ignore_longer_outputs_than_inputs=True)
-    ctc_loss = tf.Print(ctc_loss, [ctc_loss], "CTC loss: ", summarize=32)
+    # ctc_loss = tf.Print(ctc_loss, [ctc_loss], "CTC loss: ", summarize=32)
     ctc_loss_mean = tf.reduce_mean(ctc_loss, name='ctc_loss')
-    ctc_loss_mean = tf.Print(ctc_loss_mean, [ctc_loss_mean], "mean CTC loss: ")
+    # ctc_loss_mean = tf.Print(ctc_loss_mean, [ctc_loss_mean], "mean CTC loss: ")
     # tf.add_to_collection('losses', ctc_loss_mean)
 
     # The total loss is defined as the cross entropy loss plus all
