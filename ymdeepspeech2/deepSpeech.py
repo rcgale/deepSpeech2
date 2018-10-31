@@ -214,7 +214,7 @@ def loss(logits, labels, seq_lens):
     ## scheme 2
     conved_seq_lens = get_rnn_seqlen(seq_lens)
 
-    conved_seq_lens = tf.Print(conved_seq_lens, [conved_seq_lens], "conved seq len: ", summarize=32)
+    # conved_seq_lens = tf.Print(conved_seq_lens, [conved_seq_lens], "conved seq len: ", summarize=32)
 
     # Calculate the average ctc loss across the batch.
     ctc_loss = tf.nn.ctc_loss(labels=labels, inputs=tf.cast(logits, tf.float32),
