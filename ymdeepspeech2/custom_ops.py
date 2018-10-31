@@ -12,7 +12,7 @@ from tensorflow.python.ops import array_ops
 from tensorflow.python.ops import control_flow_ops
 from tensorflow.python.framework import ops
 
-from helper_routines import _variable_on_cpu
+from ymdeepspeech2.helper_routines import _variable_on_cpu
 
 class CustomRNNCell(BasicRNNCell):
     """ This is a customRNNCell that allows the weights
@@ -88,7 +88,7 @@ def stacked_brnn(cell_fw, cell_bw, num_units, num_layers, inputs, batch_size, co
     :return: the output of last layer bidirectional rnn with concatenating
     """
     prev_layer = inputs
-    for i in xrange(num_layers):
+    for i in range(num_layers):
         with tf.variable_scope("brnn-%d" % i) as scope:
             state_fw = cell_fw.zero_state(batch_size, tf.float32)
             state_bw = cell_fw.zero_state(batch_size, tf.float32)

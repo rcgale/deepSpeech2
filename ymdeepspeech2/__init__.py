@@ -1,0 +1,1 @@
+from ymdeepspeech2.deepSpeech import inference

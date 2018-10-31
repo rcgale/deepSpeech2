@@ -25,7 +25,10 @@ import tensorflow as tf
 
 # Note this definition must match the ALPHABET chosen in
 # preprocess_Librispeech.py
+from ymdeepspeech2 import deepSpeech_input
+
 ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ' "
+NUM_CLASSES = deepSpeech_input.NUM_CLASSES
 IX_TO_CHAR = {i: ch for (i, ch) in enumerate(ALPHABET)}
 
 
@@ -206,7 +209,7 @@ def evaluate():
         # Build ops that computes the logits predictions from the
         # inference model.
         ARGS.keep_prob = 1.0  # Disable dropout during testing.
-        logits = deepSpeech.inference(session, feats, seq_lens, ARGS)
+        logits = deepSpeech.inference(feats, seq_lens, ARGS)
 
         # Calculate predictions.
         output_log_prob = tf.nn.log_softmax(logits)

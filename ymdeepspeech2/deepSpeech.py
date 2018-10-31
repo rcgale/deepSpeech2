@@ -22,14 +22,13 @@ Summary of major functions:
 
 import tensorflow as tf
 
-from helper_routines import _variable_on_cpu
-from helper_routines import _variable_with_weight_decay
-from helper_routines import _activation_summary
-import custom_ops
-import deepSpeech_input
+from ymdeepspeech2.helper_routines import _variable_on_cpu
+from ymdeepspeech2.helper_routines import _variable_with_weight_decay
+from ymdeepspeech2.helper_routines import _activation_summary
+from ymdeepspeech2 import custom_ops
+from ymdeepspeech2 import deepSpeech_input
 
 # Global constants describing the speech data set.
-NUM_CLASSES = deepSpeech_input.NUM_CLASSES
 NUM_PER_EPOCH_FOR_TRAIN = deepSpeech_input.NUM_PER_EPOCH_FOR_TRAIN
 NUM_PER_EPOCH_FOR_EVAL = deepSpeech_input.NUM_PER_EPOCH_FOR_EVAL
 NUM_PER_EPOCH_FOR_TEST = deepSpeech_input.NUM_PER_EPOCH_FOR_TEST
@@ -46,7 +45,7 @@ def get_rnn_seqlen(seq_lens):
 
  
     # rnn_seq_lens = tf.Print(rnn_seq_lens, [rnn_seq_lens], "Conved seq len: ", summarize=32)
-    # print "rnn_seq_lens shape: ", rnn_seq_lens.get_shape().as_list()
+    # print("rnn_seq_lens shape: ", rnn_seq_lens.get_shape().as_list())
     return rnn_seq_lens
 
 
@@ -70,7 +69,7 @@ def inputs(eval_data, data_dir, batch_size, use_fp16, shuffle):
     """
     if not data_dir:
         raise ValueError('Please supply a data_dir')
-    print 'Using LibriSpeech Corpus'
+    print('Using LibriSpeech Corpus')
     feats, labels, seq_lens = deepSpeech_input.inputs(eval_data=eval_data,
                                                       data_dir=data_dir,
                                                       batch_size=batch_size,
@@ -78,7 +77,7 @@ def inputs(eval_data, data_dir, batch_size, use_fp16, shuffle):
     return feats, labels, seq_lens
 
 
-def inference(sess, feats, seq_lens, params):
+def inference(feats, seq_lens, params, num_classes):
     """Build the deepSpeech model.
 
     Args:
@@ -172,17 +171,17 @@ def inference(sess, feats, seq_lens, params):
 
     # Linear layer(WX + b) - softmax is applied by CTC cost function.
     with tf.variable_scope('softmax_linear') as scope:
-        weights = _variable_with_weight_decay('weights', [NUM_CLASSES, params.num_hidden * 2],
+        weights = _variable_with_weight_decay('weights', [num_classes, params.num_hidden * 2],
                                               wd_value=None,
                                               use_fp16=params.use_fp16)
-        biases = _variable_on_cpu('biases', [NUM_CLASSES],
+        biases = _variable_on_cpu('biases', [num_classes],
                                   tf.constant_initializer(0.0),
                                   params.use_fp16)
         logit_inputs = tf.reshape(rnn_outputs, [-1, params.num_hidden * 2])
         logits = tf.add(tf.matmul(logit_inputs, weights, transpose_a=False, transpose_b=True),
                         biases, name=scope.name)
-        logits = tf.reshape(logits, [-1, params.batch_size, NUM_CLASSES])
-        _activation_summary(logits)
+        logits = tf.reshape(logits, [-1, params.batch_size, num_classes])
+        activation_summary(logits)
 
     return logits
 

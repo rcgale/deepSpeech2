@@ -14,24 +14,20 @@ speech recognition." arXiv preprint arXiv:1412.5567 (2014).
  arXiv preprint arXiv:1512.02595 (2015).
 """
 
-from datetime import datetime
-import os.path
-import re
-import time
 import argparse
-import json
-import sys
-import numpy as np
 import distutils.util
+import json
+import os.path
+import sys
+import time
+from datetime import datetime
 
+import numpy as np
 import tensorflow as tf
-from tensorflow.python.client import device_lib
 from tensorflow.python.client import timeline
-from tensorflow.python import debug as tf_debug
 
-import helper_routines
-from setenvs import setenvs
-from setenvs import arglist
+from ymdeepspeech2.setenvs import setenvs
+
 
 def parse_args():
     " Parses command line arguments."
@@ -101,11 +97,11 @@ def parse_args():
  
     args = parser.parse_args()
 
-    print "debug: ", args.debug
-    print "nchw: ", args.nchw
-    print "dummy: ", args.dummy
-    print "engine: ", args.engine
-    print "initial lr: ", args.initial_lr
+    print("debug: ", args.debug)
+    print("nchw: ", args.nchw)
+    print("dummy: ", args.dummy)
+    print("engine: ", args.engine)
+    print("initial lr: ", args.initial_lr)
 
     # Read architecture hyper-parameters from checkpoint file
     # if one is provided.
@@ -126,7 +122,9 @@ def parse_args():
 
 ARGS = parse_args()
 
-import deepSpeech
+from ymdeepspeech2 import deepSpeech, deepSpeech_input
+
+NUM_CLASSES = deepSpeech_input.NUM_CLASSES
 
 g = tf.Graph()
 profiling = []
@@ -148,7 +146,7 @@ def tower_loss(sess, feats, labels, seq_lens):
     """
 
     # Build inference Graph.
-    logits = deepSpeech.inference(sess, feats, seq_lens, ARGS)
+    logits = deepSpeech.inference(feats, seq_lens, ARGS, NUM_CLASSES)
 
     # Build the portion of the Graph calculating the losses. Note that we will
     # assemble the total_loss using a custom function below.
@@ -285,7 +283,7 @@ def run_train_loop(sess, operations, saver):
 
     # Evaluate the ops for max_steps
     for step in range(ARGS.max_steps):
-        print "Step: ", step
+        print("Step: ", step)
 
         start_time = time.time()
 
@@ -447,10 +445,10 @@ def train():
 
         # Initialize vars.
         if ARGS.checkpoint is not None:
-            print "can use checkpoint"
+            print("can use checkpoint")
             global_step = initialize_from_checkpoint(sess, saver)
         else:
-            print "cannot use checkpoint"
+            print("cannot use checkpoint")
             sess.run(tf.global_variables_initializer())
 
         # print "Trainable Variables: "
